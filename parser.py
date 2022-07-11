@@ -3,7 +3,7 @@
 #import os
 #import asyncio
 import requests
-#from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup
 import json
 
 class Card():
@@ -12,10 +12,12 @@ class Card():
     name = None
     service = None
     updated = None
+    img_icon = None
+    img_bg = None
 
 class Parser():
-    def get_json_cards_file(self, page: str, cookies):
-        r = requests.get(page, cookies=cookies)
+    def get_json_cards_file(self, page: str):
+        r = requests.get(page)
         print(r.status_code)
 
         with open('data.json', 'w', encoding='utf-8') as json_file:
@@ -25,6 +27,7 @@ class Parser():
         #открыть файл
         #взять запись
         #создать объект карточки и добавить в список
+
         #в гуи вывести карточку(временно в консоли распечатать)
         with open('data.json', encoding='utf-8') as json_file:
             json_data = json.load(json_file)
@@ -37,6 +40,8 @@ class Parser():
             card.name = card_item.get('name')
             card.service = card_item.get('service')
             card.updated = card_item.get('updated')
+            card.img_icon = 'https://beta.kemono.party/icons/patreon/' + card.id
+            card.img_bg = 'https://beta.kemono.party/banners/patreon/' + card.id
             all_cards_list.append(card)
         return all_cards_list
 
@@ -49,6 +54,8 @@ class Parser():
         return patreon_cards_list
 
 if __name__ == '__main__':
+    # для гуя - фоновый цвет подложки под категорию Patreon - background-color: rgb(250, 87, 66);
+    # - стиль бакграундовой картинки - background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8)), url("/banners/patreon/53460849");
     main_url = 'https://beta.kemono.party/'
     artist_search_url = 'https://beta.kemono.party/artists'
     #получить переадресацию с основного урла на апи
@@ -57,10 +64,8 @@ if __name__ == '__main__':
     post_search_url = 'https://beta.kemono.party/posts?q=vam'
     artist_recent_url = 'https://beta.kemono.party/artists/updated'
 
-    cookies = {'__ddg1_': 'WrOnkniYmaRZh8FSCPhV', 'session': 'eyJfcGVybWFuZW50Ijp0cnVlLCJhY2NvdW50X2lkIjoxODg4ODB9.Yse1uw.ZdxfkWp0bRj618a6dp9PnK9Eg-Q'}
-
     parser = Parser()
-    #parser.get_json_cards_file(artist_search_json_url, cookies)
+    #parser.get_json_cards_file(artist_search_json_url)
     print('Json file done!')
 
     all_cards_list = parser.json_file_parser()
@@ -71,4 +76,6 @@ if __name__ == '__main__':
     print(patreon_card0.name)
     print(patreon_card0.service)
     print(patreon_card0.updated)
+    print(patreon_card0.img_icon)
+    print(patreon_card0.img_bg)
     print('=======')
