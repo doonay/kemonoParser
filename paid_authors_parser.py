@@ -1,4 +1,3 @@
-#Не работает проверка на дубликаты при добавлении в финальный список
 #Очень долго. Попробовать спарсить с помощью asyncio
 #Добавить результат в базу (отдельная таблица)
 
@@ -14,17 +13,18 @@ class PaidParser():
         self.session = requests.Session()
         self.r = self.session.get(self.url, headers=self.headers, cookies=self.cookies) # подсунули свой кук с согласием
         self.soup = bs(self.r.text, 'lxml')
+        self.last_page = None
 
     def get_pagination(self):
         last_page = self.soup.find('ul', class_="pageNav-main").find_all('li')[3].div.div.div.div.div.input.get('max')
         return int(last_page)
 
     def parse_authors(self):
-        last_page = self.get_pagination()
+        self.last_page = self.get_pagination()
         url_prefix = 'https://hub.virtamate.com/resources/categories/paid.5/?page='
 
         pages = []
-        for url_suffix in range(1, last_page + 1):
+        for url_suffix in range(1, self.last_page + 1):
             pages.append(url_prefix + str(url_suffix))
         return pages
 
@@ -32,22 +32,29 @@ class PaidParser():
         r = self.session.get(page, headers=self.headers, cookies=self.cookies) # подсунули свой кук с согласием
         soup = bs(r.text, 'lxml')
 
-        print(page)
+        print(page.replace('https://hub.virtamate.com/resources/categories/paid.5/?page=', ''), 'of', self.last_page)
         authors = soup.find_all('div', class_="structItem")
 
         one_page_author_list = []
         for author in authors:
             if author.get('data-author') not in one_page_author_list:
                 one_page_author_list.append(author.get('data-author'))
-            #print(author.get('data-author'), 'added.')
+                #print(author.get('data-author'), 'added.')
         return one_page_author_list
 
     def parse_pages(self, pages):
         all_author_list = []
         for page in pages:
-            all_author_list += self. parse_page(page)
+            for author in self.parse_page(page):
+                if author not in all_author_list:
+                    all_author_list.append(author)
+                    print(author, 'added.')
         return all_author_list
 
+    def export_data(self, authors):
+        for author in authors:
+            with open('authors', 'a') as file:
+                file.write(author + '\n')
 
 
 if __name__ == ('__main__'):
@@ -57,4 +64,4 @@ if __name__ == ('__main__'):
     page = pages[-1] #test
     #paidParser.parse_pages(page)
     authors = paidParser.parse_pages(pages)
-    print(authors)
+    paidParser.export_data(authors)
