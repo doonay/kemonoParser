@@ -53,7 +53,7 @@ class PaidParser():
 
     def export_data(self, authors):
         for author in authors:
-            with open('authors', 'a') as file:
+            with open('vam_authors', 'a') as file:
                 file.write(author + '\n')
 
 

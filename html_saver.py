@@ -1,0 +1,78 @@
+import os
+import requests
+from bs4 import BeautifulSoup
+
+class HTMLSaver():
+
+    def __init__(self, url):
+        self.url = url #'https://hub.virtamate.com/resources/categories/paid.5/'
+        self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:95.0) Gecko/20100101 Firefox/95.0'}
+        self.cookies = {'vamhubconsent': 'yes'}
+        self.session = requests.Session()
+        self.r = self.session.get(self.url, headers=self.headers, cookies=self.cookies) # подсунули свой кук с согласием
+        self.soup = BeautifulSoup(self.r.text, 'lxml')
+        self.last_page = None
+
+    def get_pagination(self):
+        x = self.soup.find('small').get_text().strip().rfind(' ') + 1
+        last_page = self.soup.find('small').get_text().strip()[x:]
+        return int(last_page)
+
+    def get_all_cards(self):
+        baseurl = self.url
+        pagination = self.get_pagination()
+        all_content_links = []
+        for page in range(0, int(pagination), 25):
+            url = baseurl + '?o=' + str(page)
+            #print(url)
+            r = requests.get(url)
+            soup = BeautifulSoup(r.text, 'lxml')
+            raw_cards = soup.find_all('article', class_='post-card')
+
+            for card in raw_cards:
+                link = 'https://beta.kemono.party' + card.a.get('href')
+                all_content_links.append(link)
+        return all_content_links
+
+
+
+    def parse_content_links(self):
+        self.last_page = self.get_pagination()
+        url_prefix = 'https://hub.virtamate.com/resources/categories/paid.5/?page='
+
+        pages = []
+        for url_suffix in range(1, self.last_page + 1):
+            pages.append(url_prefix + str(url_suffix))
+        return pages
+
+    def dir_maker(self, name: str):
+        try:
+            os.mkdir(name)
+        except FileExistsError:
+            pass
+
+    def html_saver(self, one_user_all_cards_urls, contentdir='content'):
+
+        for one_card_url in one_user_all_cards_urls:
+
+            filename = os.path.split(one_card_url)[1]
+            print(filename)
+            dirname = os.path.split(os.path.split(os.path.split(one_card_url)[0])[0])[1]
+            print(dirname)
+
+
+            #name = os.path.split(one_card_url)[1]
+            self.dir_maker(contentdir)
+            self.dir_maker(contentdir + '/' + dirname)
+            #print(name)
+            r = requests.get(one_card_url) #url - ссылка
+            html = r.text
+
+            with open(contentdir + '/' + dirname + '/' + filename + '.html', 'w', encoding='utf-8') as html_file:
+                html_file.write(html)
+
+if __name__ == ('__main__'):
+    htmlSaver = HTMLSaver('https://beta.kemono.party/patreon/user/50768560')
+    one_user_all_cards_urls = htmlSaver.get_all_cards()
+    htmlSaver.html_saver(one_user_all_cards_urls)
+    #print(htmlSaver.get_pagination())
