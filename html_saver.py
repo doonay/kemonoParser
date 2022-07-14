@@ -4,8 +4,9 @@ from bs4 import BeautifulSoup
 
 class HTMLSaver():
 
-    def __init__(self, url):
+    def __init__(self, url, name='OtherVAM'):
         self.url = url #'https://hub.virtamate.com/resources/categories/paid.5/'
+        self.name = name
         self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:95.0) Gecko/20100101 Firefox/95.0'}
         self.cookies = {'vamhubconsent': 'yes'}
         self.session = requests.Session()
@@ -56,10 +57,8 @@ class HTMLSaver():
         for one_card_url in one_user_all_cards_urls:
 
             filename = os.path.split(one_card_url)[1]
-            print(filename)
-            dirname = os.path.split(os.path.split(os.path.split(one_card_url)[0])[0])[1]
-            print(dirname)
-
+            #dirname = os.path.split(os.path.split(os.path.split(one_card_url)[0])[0])[1]
+            dirname = self.name
 
             #name = os.path.split(one_card_url)[1]
             self.dir_maker(contentdir)
@@ -72,7 +71,7 @@ class HTMLSaver():
                 html_file.write(html)
 
 if __name__ == ('__main__'):
-    htmlSaver = HTMLSaver('https://beta.kemono.party/patreon/user/50768560')
+    htmlSaver = HTMLSaver('https://beta.kemono.party/patreon/user/50768560', 'OtherVAM')
     one_user_all_cards_urls = htmlSaver.get_all_cards()
     htmlSaver.html_saver(one_user_all_cards_urls)
     #print(htmlSaver.get_pagination())
