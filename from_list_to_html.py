@@ -1,6 +1,7 @@
 import csv
 from html_saver import HTMLSaver
 
+
 def csv_reader():
     with open('good_links.csv', encoding='utf-8') as csv_file:
         file_reader = csv.reader(csv_file, delimiter=";")

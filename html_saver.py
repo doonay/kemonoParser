@@ -1,6 +1,7 @@
 import os
 import requests
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 class HTMLSaver():
 
@@ -21,7 +22,11 @@ class HTMLSaver():
 
     def get_all_cards(self):
         baseurl = self.url
-        pagination = self.get_pagination()
+        try:
+            pagination = self.get_pagination()
+        except AttributeError:
+            pagination = str(1)
+
         all_content_links = []
         for page in range(0, int(pagination), 25):
             url = baseurl + '?o=' + str(page)
@@ -54,7 +59,8 @@ class HTMLSaver():
 
     def html_saver(self, one_user_all_cards_urls, contentdir='content'):
 
-        for one_card_url in one_user_all_cards_urls:
+        progess_one_user_all_cards_urls = tqdm(one_user_all_cards_urls)
+        for one_card_url in progess_one_user_all_cards_urls:
 
             filename = os.path.split(one_card_url)[1]
             #dirname = os.path.split(os.path.split(os.path.split(one_card_url)[0])[0])[1]
@@ -69,6 +75,7 @@ class HTMLSaver():
 
             with open(contentdir + '/' + dirname + '/' + filename + '.html', 'w', encoding='utf-8') as html_file:
                 html_file.write(html)
+                progess_one_user_all_cards_urls.set_description("Processing %s" % one_card_url)
 
 if __name__ == ('__main__'):
     htmlSaver = HTMLSaver('https://beta.kemono.party/patreon/user/50768560', 'OtherVAM')
