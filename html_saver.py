@@ -2,6 +2,7 @@ import os
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
+import time
 
 class HTMLSaver():
 
@@ -70,15 +71,28 @@ class HTMLSaver():
             self.dir_maker(contentdir)
             self.dir_maker(contentdir + '/' + dirname)
             #print(name)
-            r = requests.get(one_card_url) #url - ссылка
+            while True:
+                try:
+                    r = requests.get(one_card_url) #url - ссылка
+                    break
+                except requests.exceptions.ConnectionError:
+                    time.sleep(5)
+
             html = r.text
 
-            with open(contentdir + '/' + dirname + '/' + filename + '.html', 'w', encoding='utf-8') as html_file:
-                html_file.write(html)
-                progess_one_user_all_cards_urls.set_description("Processing %s" % one_card_url)
+            isexist = os.path.exists(contentdir + '/' + dirname + '/' + filename + '.html')
+            if isexist:
+                pass
+            else:
+                with open(contentdir + '/' + dirname + '/' + filename + '.html', 'w', encoding='utf-8') as html_file:
+                    html_file.write(html)
+                    progess_one_user_all_cards_urls.set_description("Processing %s" % one_card_url)
 
 if __name__ == ('__main__'):
-    htmlSaver = HTMLSaver('https://beta.kemono.party/patreon/user/50768560', 'OtherVAM')
+    #htmlSaver = HTMLSaver('https://beta.kemono.party/patreon/user/50768560', 'OtherVAM')
+    htmlSaver = HTMLSaver('https://beta.kemono.party/patreon/user/8261834','s p l i n e VR')
     one_user_all_cards_urls = htmlSaver.get_all_cards()
     htmlSaver.html_saver(one_user_all_cards_urls)
     #print(htmlSaver.get_pagination())
+
+
