@@ -4,7 +4,6 @@
 #import asyncio
 import requests
 from bs4 import BeautifulSoup
-import json
 
 class Card():
     id = None
@@ -111,7 +110,7 @@ class UserPageParser():
 if __name__ == '__main__':
     host = 'https://beta.kemono.party/'
     #pathreon_user_url = 'https://beta.kemono.party/patreon/user/31211919'
-    pathreon_user_url = 'https://beta.kemono.party/patreon/user/2586706'
+    pathreon_user_url = 'https://beta.kemono.party/fanbox/user/15088925'
     #pathreon_user_url = 'https://beta.kemono.party/patreon/user/29268099' #79
     #pathreon_user_url = 'https://beta.kemono.party/patreon/user/50354292'
     #pathreon_user_url = 'https://beta.kemono.party/patreon/user/58933632'

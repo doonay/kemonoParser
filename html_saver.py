@@ -90,7 +90,8 @@ class HTMLSaver():
 
 if __name__ == ('__main__'):
     #htmlSaver = HTMLSaver('https://beta.kemono.party/patreon/user/50768560', 'OtherVAM')
-    htmlSaver = HTMLSaver('https://beta.kemono.party/patreon/user/8261834','s p l i n e VR')
+    htmlSaver = HTMLSaver('https://beta.kemono.party/fanbox/user/15088925', 'Vrlewd')
+    #htmlSaver = HTMLSaver('https://beta.kemono.party/patreon/user/8261834','s p l i n e VR')
     one_user_all_cards_urls = htmlSaver.get_all_cards()
     htmlSaver.html_saver(one_user_all_cards_urls)
     #print(htmlSaver.get_pagination())
